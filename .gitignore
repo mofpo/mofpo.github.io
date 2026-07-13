@@ -1,0 +1,22 @@
+frameMoE.zip
+
+# Raw source footage / run data (not for deployment; derived clips live in assets/)
+runs_cup/
+runs_ice/
+cup_3e_P1.mp4
+ice_3e_GB0.mp4
+*.tex
+*.bib
+*.bst
+*.sty
+*.pdf
+!assets/corl-mof-policy.pdf
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+
+# Provided plot source images (baked into router videos)
+/cup.png
+/ice.png

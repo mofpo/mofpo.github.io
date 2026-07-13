@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Mixture of Frames Policy icon">
+  <circle cx="256" cy="256" r="252" fill="#fff" stroke="#e7e7e7" stroke-width="2" />
+  <path
+    d="M72 128H272C276 128 278 130 278 134V186C278 190 276 192 272 192H262C256 168 244 160 220 160H143L210 256L139 352H225C248 352 260 342 267 319H278L263 384H70C66 384 64 382 64 378V362L171 256L64 148V134C64 130 66 128 72 128Z"
+    fill="#000"
+  />
+  <path d="M346 292V134" stroke="#00ba0d" stroke-width="28" stroke-linecap="round" />
+  <path d="M346 105L312 171H380Z" fill="#00ba0d" />
+  <path d="M346 292H444" stroke="#ff0a0a" stroke-width="28" stroke-linecap="round" />
+  <path d="M482 292L430 260L440 292L430 324Z" fill="#ff0a0a" />
+  <path d="M346 292L298 365" stroke="#075cff" stroke-width="28" stroke-linecap="round" />
+  <path d="M280 386L286 324L324 350Z" fill="#075cff" />
+</svg>

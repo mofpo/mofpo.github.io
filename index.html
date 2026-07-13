@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mixture of Frames Policy</title>
+    <meta name="description" content="Mixture of Frames Policy — multi-frame action denoising for bimanual mobile manipulation. CoRL 2026." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mof-policy.github.io" />
+    <meta property="og:title" content="Mixture of Frames Policy" />
+    <meta
+      property="og:description"
+      content="Multi-frame action denoising for bimanual mobile manipulation."
+    />
+    <meta property="og:image" content="https://mof-policy.github.io/images/teaser.jpg" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
+    <link
+      rel="preload"
+      href="assets/hero-robot-ice-4x-poster.webp"
+      as="image"
+      type="image/webp"
+      fetchpriority="high"
+    />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+  </head>
+  <body>
+    <main>
+      <section class="section hero" id="top">
+        <div class="wrap hero-wrap">
+          <h1>Mixture of Frames Policy</h1>
+          <p class="subtitle">
+            Multi-Frame Action Denoising for Bimanual Mobile Manipulation
+          </p>
+          <p class="authors">
+            <a href="https://www.dianwang.io/" target="_blank" rel="noopener">Dian Wang</a><sup>*</sup>,
+            <a href="https://jisangpark.com" target="_blank" rel="noopener">Jisang Park</a><sup>*</sup>,
+            <a href="https://xxm19.github.io/" target="_blank" rel="noopener">Xiaomeng Xu</a>,
+            <a href="https://doublehan07.github.io/" target="_blank" rel="noopener">Han Zhang</a>,
+            <a href="https://shurans.github.io/" target="_blank" rel="noopener">Shuran Song</a><sup>&dagger;</sup>,
+            <a href="https://web.stanford.edu/~bohg/" target="_blank" rel="noopener">Jeannette Bohg</a><sup>&dagger;</sup>
+          </p>
+          <p class="affiliation">
+            <img
+              class="affiliation-logo"
+              src="images/stanford-logo.png"
+              alt="Stanford University"
+              width="961"
+              height="245"
+            />
+          </p>
+          <p class="author-notes">
+            <sup>*</sup>Equal Contribution
+            <span class="note-gap"></span>
+            <sup>&dagger;</sup>Equal Advising
+          </p>
+          <nav class="paper-actions" aria-label="Project links">
+            <a class="button" href="assets/mofpo.pdf">
+              <span class="icon" aria-hidden="true">
+                <i class="fa fa-file-pdf-o"></i>
+              </span>
+              <span>Paper</span>
+            </a>
+          </nav>
+
+          <div class="hero-teaser-parts">
+            <figure class="media-frame hero-teaser-part">
+              <div class="baseline-title">
+                Bimanual Mobile Manipulation is Multi-Frame
+              </div>
+              <div class="hero-robot-row">
+                <video
+                  class="hero-robot-clip"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="metadata"
+                  poster="assets/hero-robot-ice-4x-poster.webp"
+                  width="1080"
+                  height="810"
+                  aria-label="Real-robot bimanual mobile manipulation demonstration, shown at four times speed."
+                >
+                  <source src="assets/hero-robot-ice-4x.mp4" type="video/mp4" />
+                  Real-robot bimanual mobile manipulation demonstration.
+                </video>
+                <video
+                  class="hero-robot-clip lazy-video"
+                  data-lazy-video
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="none"
+                  poster="assets/hero-robot-cup-4x-poster.webp"
+                  width="1080"
+                  height="810"
+                  aria-label="Real-robot bimanual mobile manipulation demonstration, shown at four times speed."
+                >
+                  <source data-src="assets/hero-robot-cup-4x.mp4" type="video/mp4" />
+                  Real-robot bimanual mobile manipulation demonstration.
+                </video>
+              </div>
+              <figcaption>
+                A bimanual mobile robot naturally operates in multiple coordinate
+                frames, including its base, its left and right end-effectors frames, etc.
+              </figcaption>
+            </figure>
+
+            <figure class="media-frame hero-teaser-part">
+              <div class="baseline-title">
+                The Choice of the Coordinate Frame Determines Action
+                Representation Complexity
+              </div>
+              <video
+                class="lazy-video"
+                data-lazy-video
+                autoplay
+                loop
+                muted
+                playsinline
+                preload="none"
+                poster="assets/homepage-teaser-part2-poster.webp"
+                width="1280"
+                height="570"
+                aria-label="The same relative trajectory expressed in left and right frames."
+              >
+                <source
+                  data-src="assets/homepage-teaser-part2.mp4"
+                  type="video/mp4"
+                />
+                The same relative trajectory expressed in left and right frames.
+              </video>
+              <figcaption>
+                The same motion can be compact and pose-invariant in one frame
+                yet spread into a broad, harder-to-learn distribution in another,
+                so the chosen frame directly affects how hard the policy is to
+                learn.
+              </figcaption>
+            </figure>
+
+            <figure class="media-frame hero-teaser-part">
+              <div class="baseline-title">
+                No Single Frame is Universally Optimal
+              </div>
+              <video
+                class="lazy-video"
+                data-lazy-video
+                autoplay
+                loop
+                muted
+                playsinline
+                preload="none"
+                poster="assets/homepage-teaser-part3-poster.webp"
+                width="1280"
+                height="600"
+                aria-label="Different motions are best represented in different frames."
+              >
+                <source
+                  data-src="assets/homepage-teaser-part3.mp4"
+                  type="video/mp4"
+                />
+                Different motions are best represented in different frames.
+              </video>
+              <figcaption>
+                Reaching is simplest in each hand's own frame, while holding a
+                cup upright is better described in the base frame &mdash; so no
+                single fixed frame is best for every phase of a task.
+              </figcaption>
+            </figure>
+
+            <figure class="media-frame hero-teaser-part">
+              <div class="baseline-title">Mixture of Frames (MoF) Policy</div>
+              <video
+                class="lazy-video"
+                data-lazy-video
+                autoplay
+                loop
+                muted
+                playsinline
+                preload="none"
+                poster="assets/homepage-teaser-part4-poster.webp"
+                width="1280"
+                height="600"
+                aria-label="Frame-specialized experts fused in a canonical frame."
+              >
+                <source
+                  data-src="assets/homepage-teaser-part4.mp4"
+                  type="video/mp4"
+                />
+                Frame-specialized experts fused in a canonical frame.
+              </video>
+              <figcaption>
+                Our Mixture of Frames (MoF) policy runs frame-specialized expert denoisers in parallel: it
+                re-expresses one canonical diffusion state in each frame and
+                fuses their noise predictions back in a shared canonical frame at
+                every denoising step.
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="simulation">
+        <div class="wrap">
+          <h2>Simulation Experiments</h2>
+
+          <figure class="media-frame">
+            <video
+              class="lazy-video"
+              data-lazy-video
+              autoplay
+              loop
+              muted
+              playsinline
+              preload="none"
+              poster="assets/overview_2row_grid_speedmatched_4s-poster.webp"
+              width="1280"
+              height="456"
+              aria-label="Animated overview grid of simulated bimanual manipulation tasks."
+            >
+              <source
+                data-src="assets/overview_2row_grid_speedmatched_4s.mp4"
+                type="video/mp4"
+              />
+              Animated overview grid of simulated bimanual manipulation tasks.
+            </video>
+            <figcaption>
+              We measure average task success rate (%) over nine tasks from
+              BiGym (top) and DexMimicGen (bottom).
+            </figcaption>
+          </figure>
+
+          <div class="section-rule" aria-hidden="true"></div>
+
+          <div class="result-band">
+            <div>
+              <span class="number">+15%p</span>
+              <span class="label">gap by frame choice</span>
+            </div>
+            <div>
+              <span class="number">+16.5%p</span>
+              <span class="label">over Standard DP</span>
+            </div>
+            <div>
+              <span class="number">+3%p</span>
+              <span class="label">over Oracle Frame Policy</span>
+            </div>
+          </div>
+
+          <div class="question-grid">
+            <article class="question-block">
+              <p class="question-label">F1.</p>
+              <h3>
+                No single hand-designed frame wins across tasks, and frame choice
+                creates up to a 15%p gap.
+              </h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Frame</th>
+                      <th>Avg.</th>
+                      <th>Best Tasks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Left</td>
+                      <td>55.6</td>
+                      <td>2</td>
+                    </tr>
+                    <tr>
+                      <td>Right</td>
+                      <td>55.0</td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                      <td>Base</td>
+                      <td>61.0</td>
+                      <td>5</td>
+                    </tr>
+                    <tr>
+                      <td>Rel Traj</td>
+                      <td>55.8</td>
+                      <td>1</td>
+                    </tr>
+                    <tr class="emphasis-row">
+                      <td>Oracle / Worst</td>
+                      <td>63.8 / 48.8</td>
+                      <td>15.0%p gap</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="question-block">
+              <p class="question-label">F2.</p>
+              <h3>
+                MoF outperforms both the oracle frame policy and the MoE
+                baseline.
+              </h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Method</th>
+                      <th>Avg.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="emphasis-row">
+                      <td>MoF-MoE</td>
+                      <td>66.8</td>
+                    </tr>
+                    <tr>
+                      <td>MoF-Ensemble</td>
+                      <td>65.9</td>
+                    </tr>
+                    <tr>
+                      <td>Oracle Frame</td>
+                      <td>63.8</td>
+                    </tr>
+                    <tr>
+                      <td>Single-Frame Ensemble</td>
+                      <td>55.9</td>
+                    </tr>
+                    <tr>
+                      <td>MoE-DP</td>
+                      <td>55.1</td>
+                    </tr>
+                    <tr>
+                      <td>DP</td>
+                      <td>50.3</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="question-block">
+              <p class="question-label">F3.</p>
+              <h3>
+                MoF's expert set, loss, and action representation are all
+                critical.
+              </h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Ablation</th>
+                      <th>Avg.</th>
+                      <th>Delta</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="emphasis-row">
+                      <td>MoF-MoE</td>
+                      <td>66.5</td>
+                      <td>0.0</td>
+                    </tr>
+                    <tr>
+                      <td>Rel Traj canonical</td>
+                      <td>64.0</td>
+                      <td>-2.5</td>
+                    </tr>
+                    <tr>
+                      <td>w/o Best Frame</td>
+                      <td>60.3</td>
+                      <td>-6.2</td>
+                    </tr>
+                    <tr>
+                      <td>w/o Aux</td>
+                      <td>58.5</td>
+                      <td>-8.0</td>
+                    </tr>
+                    <tr>
+                      <td>w/ Ortho Proj</td>
+                      <td>59.5</td>
+                      <td>-7.0</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+
+          <div class="section-rule" aria-hidden="true"></div>
+
+          <h3 class="analysis-title">
+            Q. Where does MoF-MoE gain over the Oracle Frame policy come from?
+          </h3>
+          <div class="figure-grid half">
+            <figure class="media-frame">
+              <picture>
+                <source
+                  type="image/webp"
+                  srcset="
+                    images/threading-router-550.webp 550w,
+                    images/threading-router-800.webp 800w
+                  "
+                  sizes="(max-width: 980px) 100vw, 800px"
+                />
+                <img
+                  src="images/threading-router.png"
+                  alt="Router weight trajectories on the Threading task."
+                  width="998"
+                  height="756"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
+              <figcaption>
+                <strong>Router weights across the Threading task.</strong>
+                Each curve is one expert's weight as the task progresses (faint
+                lines: 20 individual episodes; bold lines: the 20-episode mean).
+                The <strong>rel-traj</strong> (arm-centric) expert leads early,
+                while each gripper reaches its own object &mdash; a motion that is
+                simplest in an arm-relative frame. During the later coordinated
+                bimanual insertion the <strong>base</strong> expert takes over,
+                because aligning both arms requires consistent reasoning in a
+                shared base frame. No single fixed frame fits both phases, which
+                is exactly why MoF-MoE beats even the oracle frame here (+7.7%p).
+              </figcaption>
+            </figure>
+            <figure class="media-frame">
+              <picture>
+                <source
+                  type="image/webp"
+                  srcset="
+                    images/router-advantage-550.webp 550w,
+                    images/router-advantage-800.webp 800w
+                  "
+                  sizes="(max-width: 980px) 100vw, 800px"
+                />
+                <img
+                  src="images/router-advantage.png"
+                  alt="Router modulation amplitude plotted against MoF-MoE advantage over oracle frame."
+                  width="959"
+                  height="690"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
+              <figcaption>
+                <strong>The same effect across all nine tasks.</strong>
+                The horizontal axis measures how much the router varies its
+                weights within an episode (within-episode weight std, averaged
+                over experts); the vertical axis is MoF-MoE's success-rate
+                advantage over the best single, or &ldquo;oracle,&rdquo; frame.
+                More within-episode frame-switching predicts a larger gain
+                &mdash; Threading modulates the most and gains the most, while
+                tasks whose weights stay nearly constant see little benefit; Box
+                Cleanup is the one task where MoF-MoE falls below the oracle
+                frame. The improvement therefore comes specifically from
+                <em>shifting frames as the task unfolds</em>, which a fixed-frame
+                policy cannot do.
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="real-world">
+        <div class="wrap">
+          <h2>Real World Experiments</h2>
+          <h3 class="real-world-headline">
+            Our MoF-MoE outperforms the corresponding single-frame baselines.
+          </h3>
+
+          <div class="real-figure-stack">
+            <figure class="media-frame real-task-card">
+              <picture>
+                <source
+                  type="image/webp"
+                  srcset="
+                    figures/supple_pouring-1120.webp 1120w,
+                    figures/supple_pouring-1600.webp 1600w
+                  "
+                  sizes="(max-width: 980px) 100vw, 1120px"
+                />
+                <img
+                  src="figures/supple_pouring.jpg"
+                  alt="Pouring task rollout phases and success rates for single-frame baselines and MoF-MoE."
+                  width="3766"
+                  height="770"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
+              <figcaption><strong>Pouring Task</strong></figcaption>
+            </figure>
+            <figure class="media-frame real-task-card">
+              <picture>
+                <source
+                  type="image/webp"
+                  srcset="
+                    figures/supple_serving-1120.webp 1120w,
+                    figures/supple_serving-1600.webp 1600w
+                  "
+                  sizes="(max-width: 980px) 100vw, 1120px"
+                />
+                <img
+                  src="figures/supple_serving.jpg"
+                  alt="Serving task rollout phases and success rates for single-frame baselines and MoF-MoE."
+                  width="3766"
+                  height="770"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
+              <figcaption><strong>Serving Task</strong></figcaption>
+            </figure>
+          </div>
+
+          <article class="task-block">
+            <div class="task-header">
+              <p class="task-kicker">Pouring Task</p>
+              <h3>MoF switches frames across phases.</h3>
+            </div>
+
+            <div class="task-video-stack">
+              <figure class="media-frame task-video-card">
+                <div class="baseline-title">MoF-MoE Router Weight Analysis</div>
+                <video
+                  class="lazy-video"
+                  data-lazy-video
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="none"
+                  width="1440"
+                  height="540"
+                >
+                  <source
+                    data-src="assets/ice_3e_GB3_router_progress_subtasks.mp4"
+                    type="video/mp4"
+                  />
+                </video>
+                <figcaption>
+                  Our policy shifts its router weights across phases,
+                  prioritizing the left-frame expert during pouring because the
+                  static left frame provides a stable reference.
+                </figcaption>
+              </figure>
+              <figure class="media-frame task-video-card">
+                <div class="baseline-title">MoF-MoE (85%)</div>
+                <video
+                  class="lazy-video"
+                  data-lazy-video
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="none"
+                  width="1280"
+                  height="720"
+                >
+                  <source data-src="assets/ice_3e_grid_trimmed.mp4" type="video/mp4" />
+                </video>
+              </figure>
+            </div>
+
+            <div class="section-rule" aria-hidden="true"></div>
+
+            <div class="failure-section">
+              <h3 class="failure-title">
+                Single-Frame Reasoning Shows Distinct Failure Modes
+              </h3>
+              <div class="failure-grid">
+                <figure class="media-frame">
+                  <div class="baseline-title">Left Frame Policy (15%)</div>
+                  <video
+                    class="lazy-video"
+                    data-lazy-video
+                    autoplay
+                    loop
+                    muted
+                    playsinline
+                    preload="none"
+                    width="722"
+                    height="720"
+                  >
+                    <source data-src="assets/ice_left_fail.mp4" type="video/mp4" />
+                  </video>
+                  <figcaption>
+                    Fails to pick up the right cup.
+                  </figcaption>
+                </figure>
+                <figure class="media-frame">
+                  <div class="baseline-title">Right Frame Policy (70%)</div>
+                  <video
+                    class="lazy-video"
+                    data-lazy-video
+                    autoplay
+                    loop
+                    muted
+                    playsinline
+                    preload="none"
+                    width="722"
+                    height="720"
+                  >
+                    <source data-src="assets/ice_right_fail.mp4" type="video/mp4" />
+                  </video>
+                  <figcaption>
+                    Fails to pick up the left cup.
+                  </figcaption>
+                </figure>
+                <figure class="media-frame">
+                  <div class="baseline-title">Rel-Traj Policy (5%)</div>
+                  <video
+                    class="lazy-video"
+                    data-lazy-video
+                    autoplay
+                    loop
+                    muted
+                    playsinline
+                    preload="none"
+                    width="722"
+                    height="720"
+                  >
+                    <source data-src="assets/ice_reltraj_fail.mp4" type="video/mp4" />
+                  </video>
+                  <figcaption>
+                    Struggles with bimanual coordination.
+                  </figcaption>
+                </figure>
+              </div>
+            </div>
+          </article>
+
+          <article class="task-block">
+            <div class="task-header">
+              <p class="task-kicker">Serving Task</p>
+              <h3>MoF prioritizes a stable reference.</h3>
+            </div>
+
+            <div class="task-video-stack">
+              <figure class="media-frame task-video-card">
+                <div class="baseline-title">MoF-MoE Router Weight Analysis</div>
+                <video
+                  class="lazy-video"
+                  data-lazy-video
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="none"
+                  width="1440"
+                  height="540"
+                >
+                  <source
+                    data-src="assets/cup_3e_B3_router_progress_subtasks.mp4"
+                    type="video/mp4"
+                  />
+                </video>
+                <figcaption>
+                  The left frame stays dominant while the right frame remains
+                  lowest, reflecting the plate as the most stable reference
+                  throughout the task.
+                </figcaption>
+              </figure>
+              <figure class="media-frame task-video-card">
+                <div class="baseline-title">MoF-MoE (70%)</div>
+                <video
+                  class="lazy-video"
+                  data-lazy-video
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="none"
+                  width="1280"
+                  height="720"
+                >
+                  <source data-src="assets/cup_3e_grid_trimmed.mp4" type="video/mp4" />
+                </video>
+              </figure>
+            </div>
+
+            <div class="section-rule" aria-hidden="true"></div>
+
+            <div class="failure-section">
+              <h3 class="failure-title">
+                Single-Frame Reasoning Cannot Cover All Phases
+              </h3>
+              <div class="failure-grid">
+                <figure class="media-frame">
+                  <div class="baseline-title">Left Frame Policy (55%)</div>
+                  <video
+                    class="lazy-video"
+                    data-lazy-video
+                    autoplay
+                    loop
+                    muted
+                    playsinline
+                    preload="none"
+                    width="722"
+                    height="720"
+                  >
+                    <source data-src="assets/cup_left_fail.mp4" type="video/mp4" />
+                  </video>
+                  <figcaption>
+                    Shifts the cup during long navigation, leading to grasp
+                    failures.
+                  </figcaption>
+                </figure>
+                <figure class="media-frame">
+                  <div class="baseline-title">Right Frame Policy (0%)</div>
+                  <video
+                    class="lazy-video"
+                    data-lazy-video
+                    autoplay
+                    loop
+                    muted
+                    playsinline
+                    preload="none"
+                    width="722"
+                    height="720"
+                  >
+                    <source data-src="assets/cup_right_fail.mp4" type="video/mp4" />
+                  </video>
+                  <figcaption>
+                    Unstable navigation prevents the policy from reaching the
+                    grasp phase.
+                  </figcaption>
+                </figure>
+                <figure class="media-frame">
+                  <div class="baseline-title">Rel-Traj Policy (60%)</div>
+                  <video
+                    class="lazy-video"
+                    data-lazy-video
+                    autoplay
+                    loop
+                    muted
+                    playsinline
+                    preload="none"
+                    width="722"
+                    height="720"
+                  >
+                    <source data-src="assets/cup_reltraj_fail.mp4" type="video/mp4" />
+                  </video>
+                  <figcaption>
+                    Navigates stably but lacks bimanual coordination during
+                    grasping.
+                  </figcaption>
+                </figure>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+    </main>
+    <script>
+      (() => {
+        const lazyVideos = document.querySelectorAll("video[data-lazy-video]");
+
+        const loadVideo = (video) => {
+          if (video.dataset.loaded === "true") {
+            return;
+          }
+
+          video.querySelectorAll("source[data-src]").forEach((source) => {
+            source.src = source.dataset.src;
+            source.removeAttribute("data-src");
+          });
+          video.dataset.loaded = "true";
+          video.load();
+
+          if (video.autoplay) {
+            video.play().catch(() => {});
+          }
+        };
+
+        if (!("IntersectionObserver" in window)) {
+          lazyVideos.forEach(loadVideo);
+          return;
+        }
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) {
+                return;
+              }
+
+              loadVideo(entry.target);
+              observer.unobserve(entry.target);
+            });
+          },
+          { rootMargin: "300px 0px" }
+        );
+
+        lazyVideos.forEach((video) => observer.observe(video));
+      })();
+    </script>
+  </body>
+</html>
