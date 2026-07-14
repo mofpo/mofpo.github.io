@@ -821,7 +821,53 @@
         </div>
       </section>
 
-
+      <section class="section long-horizon" id="long-horizon">
+        <div class="wrap long-horizon-wrap">
+          <h2>Toward Long-Horizon Bimanual Mobile Manipulation</h2>
+          <p class="task-kicker">Kitchen Cleanup Task</p>
+          <p class="long-horizon-headline">
+            Our MoF-MoE dynamically switches between frame reasoning modes across subtasks.
+          </p>
+          <div class="cleanup-sync-grid" data-sync-video-section>
+            <div class="cleanup-sync-panel cleanup-task-panel">
+              <video
+                class="cleanup-sync-video lazy-video"
+                data-lazy-video
+                data-sync-video-group="cleanup"
+                autoplay
+                loop
+                muted
+                playsinline
+                preload="none"
+                width="1920"
+                height="1080"
+                aria-label="Kitchen cleanup task execution."
+              >
+                <source data-src="assets/cleanup_full.m4v" type="video/mp4" />
+                Kitchen cleanup task execution.
+              </video>
+            </div>
+            <div class="cleanup-sync-panel cleanup-weight-panel">
+              <video
+                class="cleanup-sync-video lazy-video"
+                data-lazy-video
+                data-sync-video-group="cleanup"
+                autoplay
+                loop
+                muted
+                playsinline
+                preload="none"
+                width="1254"
+                height="1080"
+                aria-label="MoF-MoE routing weights during kitchen cleanup."
+              >
+                <source data-src="assets/cleanup_progress_weight.mp4" type="video/mp4" />
+                MoF-MoE routing weights during kitchen cleanup.
+              </video>
+            </div>
+          </div>
+        </div>
+      </section>
 
     </main>
     <script>
@@ -1046,7 +1092,89 @@
           snapToPhysicalIndex(originalCount, { reset: true });
         });
 
+        const syncGroups = new Map();
+        document.querySelectorAll("video[data-sync-video-group]").forEach((video) => {
+          const groupName = video.dataset.syncVideoGroup;
+          if (!syncGroups.has(groupName)) {
+            syncGroups.set(groupName, []);
+          }
+          syncGroups.get(groupName).push(video);
+        });
 
+        syncGroups.forEach((videos) => {
+          const primary = videos[0];
+          let isSyncing = false;
+
+          const timeFor = (source, target) => {
+            if (Number.isFinite(target.duration) && target.duration > 0) {
+              return source.currentTime % target.duration;
+            }
+            return source.currentTime;
+          };
+
+          const syncTimes = (source = primary) => {
+            if (isSyncing || source.readyState < 1) {
+              return;
+            }
+            isSyncing = true;
+            videos.forEach((video) => {
+              if (video === source || video.readyState < 1) {
+                return;
+              }
+              const targetTime = timeFor(source, video);
+              if (Math.abs(video.currentTime - targetTime) > 0.08) {
+                video.currentTime = targetTime;
+              }
+            });
+            isSyncing = false;
+          };
+
+          const playGroup = (source) => {
+            if (isSyncing) {
+              return;
+            }
+            isSyncing = true;
+            videos.forEach((video) => {
+              loadVideo(video);
+              if (video !== source && video.readyState >= 1) {
+                const targetTime = timeFor(source, video);
+                if (Math.abs(video.currentTime - targetTime) > 0.08) {
+                  video.currentTime = targetTime;
+                }
+              }
+              if (video.paused) {
+                video.play().catch(() => {});
+              }
+            });
+            isSyncing = false;
+          };
+
+          const pauseGroup = () => {
+            if (isSyncing) {
+              return;
+            }
+            isSyncing = true;
+            videos.forEach((video) => {
+              if (!video.paused) {
+                video.pause();
+              }
+            });
+            isSyncing = false;
+          };
+
+          videos.forEach((video) => {
+            video.addEventListener("play", () => playGroup(video));
+            video.addEventListener("pause", pauseGroup);
+            video.addEventListener("seeked", () => syncTimes(video));
+            video.addEventListener("loadedmetadata", () => syncTimes(primary));
+          });
+
+          window.setInterval(() => {
+            if (!primary.paused) {
+              syncTimes(primary);
+            }
+          }, 250);
+        });
       })();
     </script>
   </body>
