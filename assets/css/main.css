@@ -141,12 +141,18 @@ h1 {
 }
 
 .authors a {
-  color: var(--ink);
-  text-decoration: none;
+  color: var(--green);
+  text-decoration-line: underline;
+  text-decoration-color: rgba(47, 111, 94, 0.48);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.16em;
+  text-decoration-skip-ink: none;
+  transition: color 0.2s ease-in-out, text-decoration-color 0.2s ease-in-out;
 }
 
 .authors a:hover {
-  text-decoration: underline;
+  color: var(--accent-dark);
+  text-decoration-color: currentColor;
 }
 
 .affiliation {
