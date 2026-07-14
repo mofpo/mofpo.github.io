@@ -141,9 +141,9 @@ h1 {
 }
 
 .authors a {
-  color: var(--green);
+  color: var(--ink);
   text-decoration-line: underline;
-  text-decoration-color: rgba(47, 111, 94, 0.48);
+  text-decoration-color: rgba(23, 23, 23, 0.35);
   text-decoration-thickness: 0.08em;
   text-underline-offset: 0.16em;
   text-decoration-skip-ink: none;
