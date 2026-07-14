@@ -234,10 +234,23 @@ h1 {
   line-height: 1;
 }
 
-.button .icon .fa,
-.button .icon .ai {
+.button .icon svg {
   display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
   line-height: 1;
+}
+
+.button .icon-text {
+  width: 1.35em;
+  font-size: 0.72em;
+  font-weight: 850;
+  letter-spacing: 0;
 }
 
 .lead {
@@ -353,6 +366,16 @@ h1 {
 
 .hero-carousel-control:active {
   transform: translateY(-50%) scale(0.96);
+}
+
+.hero-carousel-control svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.6;
 }
 
 .hero-carousel-control.prev {
