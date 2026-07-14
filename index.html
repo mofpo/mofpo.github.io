@@ -19,13 +19,6 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
     <link rel="manifest" href="site.webmanifest" />
-    <link
-      rel="preload"
-      href="assets/hero-robot-ice-4x-poster.webp"
-      as="image"
-      type="image/webp"
-      fetchpriority="high"
-    />
     <link rel="stylesheet" href="assets/css/main.css" />
     <link
       rel="stylesheet"
@@ -110,38 +103,71 @@
               <div class="baseline-title">
                 Bimanual Mobile Manipulation is Multi-Frame
               </div>
-              <div class="hero-robot-row">
-                <video
-                  class="hero-robot-clip"
-                  autoplay
-                  loop
-                  muted
-                  playsinline
-                  preload="metadata"
-                  poster="assets/hero-robot-ice-4x-poster.webp"
-                  width="1080"
-                  height="810"
-                  aria-label="Real-robot bimanual mobile manipulation demonstration, shown at four times speed."
-                >
-                  <source src="assets/hero-robot-ice-4x.mp4" type="video/mp4" />
-                  Real-robot bimanual mobile manipulation demonstration.
-                </video>
-                <video
-                  class="hero-robot-clip lazy-video"
-                  data-lazy-video
-                  autoplay
-                  loop
-                  muted
-                  playsinline
-                  preload="none"
-                  poster="assets/hero-robot-cup-4x-poster.webp"
-                  width="1080"
-                  height="810"
-                  aria-label="Real-robot bimanual mobile manipulation demonstration, shown at four times speed."
-                >
-                  <source data-src="assets/hero-robot-cup-4x.mp4" type="video/mp4" />
-                  Real-robot bimanual mobile manipulation demonstration.
-                </video>
+              <div class="hero-carousel" data-carousel>
+                <div class="hero-carousel-viewport" data-carousel-viewport tabindex="0" aria-label="Bimanual mobile manipulation video carousel">
+                  <div class="hero-carousel-track" data-carousel-track>
+                    <div class="hero-carousel-slide" data-carousel-slide>
+                      <video
+                        class="hero-carousel-video"
+                        autoplay
+                        muted
+                        playsinline
+                        preload="metadata"
+                        width="1440"
+                        height="1080"
+                        aria-label="Bimanual mobile manipulation cleanup teaser."
+                      >
+                        <source src="assets/hero-teaser-cleanup.m4v" type="video/mp4" />
+                        Bimanual mobile manipulation cleanup teaser.
+                      </video>
+                    </div>
+                    <div class="hero-carousel-slide" data-carousel-slide>
+                      <video
+                        class="hero-carousel-video lazy-video"
+                        data-lazy-video
+                        autoplay
+                        muted
+                        playsinline
+                        preload="none"
+                        poster="assets/hero-robot-ice-4x-poster.webp"
+                        width="1080"
+                        height="810"
+                        aria-label="Real-robot bimanual mobile manipulation demonstration with ice, shown at four times speed."
+                      >
+                        <source data-src="assets/hero-robot-ice-4x.mp4" type="video/mp4" />
+                        Real-robot bimanual mobile manipulation demonstration with ice.
+                      </video>
+                    </div>
+                    <div class="hero-carousel-slide" data-carousel-slide>
+                      <video
+                        class="hero-carousel-video lazy-video"
+                        data-lazy-video
+                        autoplay
+                        muted
+                        playsinline
+                        preload="none"
+                        poster="assets/hero-robot-cup-4x-poster.webp"
+                        width="1080"
+                        height="810"
+                        aria-label="Real-robot bimanual mobile manipulation demonstration with a cup, shown at four times speed."
+                      >
+                        <source data-src="assets/hero-robot-cup-4x.mp4" type="video/mp4" />
+                        Real-robot bimanual mobile manipulation demonstration with a cup.
+                      </video>
+                    </div>
+                  </div>
+                </div>
+                <button class="hero-carousel-control prev" type="button" data-carousel-prev aria-label="Previous video">
+                  <i class="fa fa-chevron-left" aria-hidden="true"></i>
+                </button>
+                <button class="hero-carousel-control next" type="button" data-carousel-next aria-label="Next video">
+                  <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                </button>
+                <div class="hero-carousel-dots" aria-label="Video carousel position">
+                  <button class="hero-carousel-dot is-active" type="button" data-carousel-dot aria-label="Show cleanup teaser"></button>
+                  <button class="hero-carousel-dot" type="button" data-carousel-dot aria-label="Show ice task"></button>
+                  <button class="hero-carousel-dot" type="button" data-carousel-dot aria-label="Show cup task"></button>
+                </div>
               </div>
               <figcaption>
                 A bimanual mobile robot naturally operates in multiple coordinate
@@ -795,6 +821,8 @@
         </div>
       </section>
 
+
+
     </main>
     <script>
       (() => {
@@ -819,24 +847,206 @@
 
         if (!("IntersectionObserver" in window)) {
           lazyVideos.forEach(loadVideo);
-          return;
+        } else {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) {
+                  return;
+                }
+
+                loadVideo(entry.target);
+                observer.unobserve(entry.target);
+              });
+            },
+            { rootMargin: "300px 0px" }
+          );
+
+          lazyVideos.forEach((video) => observer.observe(video));
         }
 
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (!entry.isIntersecting) {
-                return;
+        document.querySelectorAll("[data-carousel]").forEach((carousel) => {
+          const viewport = carousel.querySelector("[data-carousel-viewport]");
+          const track = carousel.querySelector("[data-carousel-track]");
+          const originalSlides = Array.from(carousel.querySelectorAll("[data-carousel-slide]"));
+          const dots = Array.from(carousel.querySelectorAll("[data-carousel-dot]"));
+          const previous = carousel.querySelector("[data-carousel-prev]");
+          const next = carousel.querySelector("[data-carousel-next]");
+          const originalCount = originalSlides.length;
+          const beforeClones = originalSlides.map((slide) => slide.cloneNode(true));
+          const afterClones = originalSlides.map((slide) => slide.cloneNode(true));
+          let logicalIndex = 0;
+          let physicalIndex = originalCount;
+          let dragStartX = 0;
+          let dragDeltaX = 0;
+          let isDragging = false;
+
+          [...beforeClones, ...afterClones].forEach((slide) => {
+            slide.setAttribute("aria-hidden", "true");
+          });
+          track.prepend(...beforeClones);
+          track.append(...afterClones);
+
+          const getPhysicalSlides = () => Array.from(track.querySelectorAll("[data-carousel-slide]"));
+          const getTranslate = () => 25 - physicalIndex * 50;
+          const getActiveVideo = () => getPhysicalSlides()[physicalIndex]?.querySelector("video");
+
+          const loadVisibleVideos = () => {
+            const physicalSlides = getPhysicalSlides();
+            [physicalIndex - 1, physicalIndex, physicalIndex + 1].forEach((slideIndex) => {
+              const video = physicalSlides[slideIndex]?.querySelector("video[data-lazy-video]");
+              if (video) {
+                loadVideo(video);
               }
-
-              loadVideo(entry.target);
-              observer.unobserve(entry.target);
             });
-          },
-          { rootMargin: "300px 0px" }
-        );
+          };
 
-        lazyVideos.forEach((video) => observer.observe(video));
+          const playActiveVideo = ({ reset = false, currentTime = null } = {}) => {
+            const activeVideo = getActiveVideo();
+            if (!activeVideo) {
+              return;
+            }
+            loadVideo(activeVideo);
+
+            const play = () => {
+              if (currentTime !== null) {
+                activeVideo.currentTime = Math.min(currentTime, activeVideo.duration || currentTime);
+              } else if (reset) {
+                activeVideo.currentTime = 0;
+              }
+              activeVideo.play().catch(() => {});
+            };
+
+            if (activeVideo.readyState >= 1) {
+              play();
+            } else {
+              activeVideo.addEventListener("loadedmetadata", play, { once: true });
+            }
+          };
+
+          const updateState = (options = {}) => {
+            getPhysicalSlides().forEach((slide, slideIndex) => {
+              slide.classList.toggle("is-active", slideIndex === physicalIndex);
+            });
+            dots.forEach((dot, dotIndex) => {
+              dot.classList.toggle("is-active", dotIndex === logicalIndex);
+            });
+            loadVisibleVideos();
+            playActiveVideo(options);
+          };
+
+          const applyTransform = () => {
+            track.style.transform = `translate3d(${getTranslate()}%, 0, 0)`;
+          };
+
+          const snapToPhysicalIndex = (nextPhysicalIndex, options = {}) => {
+            const previousTime = getActiveVideo()?.currentTime ?? null;
+            physicalIndex = nextPhysicalIndex;
+            track.style.transition = "none";
+            applyTransform();
+            updateState({
+              currentTime: options.preserveTime ? previousTime : null,
+              reset: options.reset || false,
+            });
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                track.style.transition = "";
+              });
+            });
+          };
+
+          const moveBy = (delta) => {
+            physicalIndex += delta;
+            logicalIndex = (logicalIndex + delta + originalCount) % originalCount;
+            applyTransform();
+            updateState({ reset: true });
+          };
+
+          const setLogicalIndex = (nextIndex) => {
+            logicalIndex = (nextIndex + originalCount) % originalCount;
+            physicalIndex = originalCount + logicalIndex;
+            applyTransform();
+            updateState({ reset: true });
+          };
+
+          previous.addEventListener("click", () => moveBy(-1));
+          next.addEventListener("click", () => moveBy(1));
+          dots.forEach((dot, dotIndex) => {
+            dot.addEventListener("click", () => setLogicalIndex(dotIndex));
+          });
+
+          getPhysicalSlides().forEach((slide) => {
+            const video = slide.querySelector("video");
+            video?.addEventListener("ended", () => {
+              if (slide.classList.contains("is-active")) {
+                moveBy(1);
+              }
+            });
+          });
+
+          viewport.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowLeft") {
+              event.preventDefault();
+              moveBy(-1);
+            }
+            if (event.key === "ArrowRight") {
+              event.preventDefault();
+              moveBy(1);
+            }
+          });
+
+          viewport.addEventListener("pointerdown", (event) => {
+            isDragging = true;
+            dragStartX = event.clientX;
+            dragDeltaX = 0;
+            carousel.classList.add("is-dragging");
+            viewport.setPointerCapture(event.pointerId);
+          });
+
+          viewport.addEventListener("pointermove", (event) => {
+            if (!isDragging) {
+              return;
+            }
+            dragDeltaX = event.clientX - dragStartX;
+            const dragPercent = (dragDeltaX / viewport.clientWidth) * 100;
+            track.style.transform = `translate3d(${getTranslate() + dragPercent}%, 0, 0)`;
+          });
+
+          const finishDrag = () => {
+            if (!isDragging) {
+              return;
+            }
+            carousel.classList.remove("is-dragging");
+            const threshold = Math.min(90, viewport.clientWidth * 0.16);
+            if (dragDeltaX > threshold) {
+              moveBy(-1);
+            } else if (dragDeltaX < -threshold) {
+              moveBy(1);
+            } else {
+              applyTransform();
+              updateState();
+            }
+            isDragging = false;
+          };
+
+          track.addEventListener("transitionend", (event) => {
+            if (event.target !== track) {
+              return;
+            }
+            if (physicalIndex < originalCount) {
+              snapToPhysicalIndex(physicalIndex + originalCount, { preserveTime: true });
+            } else if (physicalIndex >= originalCount * 2) {
+              snapToPhysicalIndex(physicalIndex - originalCount, { preserveTime: true });
+            }
+          });
+
+          viewport.addEventListener("pointerup", finishDrag);
+          viewport.addEventListener("pointercancel", finishDrag);
+          viewport.addEventListener("lostpointercapture", finishDrag);
+          snapToPhysicalIndex(originalCount, { reset: true });
+        });
+
+
       })();
     </script>
   </body>
