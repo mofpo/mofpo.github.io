@@ -183,7 +183,9 @@ h1 {
 
 .paper-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
   gap: 0.7rem;
   margin: 1.15rem 0 2rem;
 }
@@ -232,7 +234,8 @@ h1 {
   line-height: 1;
 }
 
-.button .icon .fa {
+.button .icon .fa,
+.button .icon .ai {
   display: block;
   line-height: 1;
 }
