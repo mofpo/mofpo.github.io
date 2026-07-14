@@ -246,11 +246,31 @@ h1 {
   line-height: 1;
 }
 
-.button .icon-text {
-  width: 1.35em;
-  font-size: 0.72em;
-  font-weight: 850;
+.button .arxiv-mark {
+  position: relative;
+  width: 1.26em;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 700;
   letter-spacing: 0;
+}
+
+.arxiv-mark-a,
+.arxiv-mark-x {
+  position: absolute;
+  line-height: 1;
+}
+
+.arxiv-mark-a {
+  bottom: -0.03em;
+  left: 0.08em;
+  font-size: 1.1em;
+}
+
+.arxiv-mark-x {
+  top: -0.03em;
+  right: 0.02em;
+  font-size: 0.72em;
 }
 
 .lead {
