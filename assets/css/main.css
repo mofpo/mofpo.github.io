@@ -770,6 +770,45 @@ th {
   background: #ffffff;
 }
 
+.paper-meta p {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.58;
+}
+
+.paper-meta a {
+  color: var(--accent-dark);
+  font-weight: 750;
+  text-decoration-line: underline;
+  text-decoration-color: rgba(100, 16, 16, 0.32);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+  text-decoration-skip-ink: none;
+}
+
+.paper-meta a:hover {
+  text-decoration-color: currentColor;
+}
+
+.citation-section {
+  background: var(--surface-tint);
+}
+
+.citation-section pre {
+  overflow-x: auto;
+  margin: 0;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  white-space: pre;
+}
+
 .baseline-title {
   padding: 0.75rem 0.95rem;
   border-bottom: 1px solid var(--line-soft);
@@ -873,6 +912,11 @@ th {
 
   .media-frame figcaption {
     font-size: 0.86rem;
+  }
+
+  .citation-section pre {
+    padding: 0.9rem;
+    font-size: 0.78rem;
   }
 
 }
