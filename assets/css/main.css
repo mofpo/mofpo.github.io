@@ -791,22 +791,26 @@ th {
 }
 
 .citation-section {
-  background: var(--surface-tint);
+  background: #f3f5f7;
 }
 
 .citation-section pre {
   overflow-x: auto;
   margin: 0;
   padding: 1.1rem 1.2rem;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(20, 24, 30, 0.12);
   border-radius: 8px;
-  background: var(--surface);
+  background: #e8ebef;
   color: var(--ink);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
   font-size: 0.9rem;
   line-height: 1.45;
   white-space: pre;
+}
+
+.citation-section code {
+  display: block;
 }
 
 .baseline-title {
